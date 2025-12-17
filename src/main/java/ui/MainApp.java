@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Graph;
 import model.GraphConfig;
+import java.net.URL;
 
 public class MainApp extends Application {
 
@@ -20,6 +21,9 @@ public class MainApp extends Application {
 
     public void showSetup() {
         Scene scene = new Scene(new GraphSetupPane(this), 600, 320);
+
+        loadCSS(scene);
+
         stage.setScene(scene);
         stage.setTitle("Graph Visualizer - Setup");
     }
@@ -33,9 +37,26 @@ public class MainApp extends Application {
         root.setLeft(controlPane);
         root.setCenter(graphPane);
 
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1100, 700); // Tăng kích thước chút cho đẹp
+
+        loadCSS(scene);
+
         stage.setScene(scene);
         stage.setTitle("Graph Visualizer - Editor");
+        stage.centerOnScreen();
+    }
+
+    private void loadCSS(Scene scene) {
+        try {
+            URL cssUrl = getClass().getResource("/style.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            } else {
+                System.err.println("Cảnh báo: Không tìm thấy file style.css!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

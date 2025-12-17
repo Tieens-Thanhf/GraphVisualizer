@@ -1,0 +1,64 @@
+/* style.css */
+
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif; /* Font hiện đại */
+    -fx-font-size: 14px;
+    -fx-background-color: #f4f6f8; /* Màu nền xám nhẹ dễ chịu */
+}
+
+/* === BUTTON === */
+.button {
+    -fx-background-color: #2196F3; /* Xanh Material */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px; /* Bo tròn góc */
+    -fx-padding: 8 15 8 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);
+}
+
+.button:hover {
+    -fx-background-color: #1976D2; /* Đậm hơn khi di chuột */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.button:pressed {
+    -fx-background-color: #0D47A1;
+    -fx-effect: none;
+}
+
+/* === TEXT FIELD & TEXT AREA === */
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cfd8dc;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-padding: 5;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #2196F3; /* Viền xanh khi nhập */
+    -fx-background-color: white;
+}
+
+/* === LABEL === */
+.label {
+    -fx-text-fill: #37474f;
+    -fx-font-weight: bold;
+}
+
+/* === COMBO BOX === */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #cfd8dc;
+    -fx-border-radius: 5px;
+}
+
+/* === CÁC PANEL CONTROL === */
+/* Tạo hiệu ứng thẻ bài (Card) cho các khung điều khiển */
+.control-pane {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-padding: 15;
+}

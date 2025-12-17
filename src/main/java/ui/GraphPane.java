@@ -26,8 +26,24 @@ public class GraphPane extends Pane {
     public GraphPane(Graph graph) {
         this.graph = graph;
 
-        // Add edgeGroup trước, nodeGroup sau -> Node luôn nằm trên Edge
+        // Set style background màu trắng
+        setStyle("-fx-background-color: white; -fx-border-color: #cfd8dc; -fx-border-width: 1px;");
+
+        // Vẽ nền kẻ ô (Grid)
+        drawGrid();
+
         getChildren().addAll(edgeGroup, nodeGroup);
+    }
+
+    private void drawGrid() {
+        // Dùng Canvas để vẽ lưới cho hiệu năng cao, hoặc đơn giản là set background image css
+        // Cách đơn giản nhất trong Java code:
+        // Ta dùng CSS background-image
+        this.setStyle(
+                "-fx-background-color: white, " +
+                        "linear-gradient(from 0.5px 0px to 10.5px 0px, repeat, #f0f0f0 5%, transparent 5%), " +
+                        "linear-gradient(from 0px 0.5px to 0px 10.5px, repeat, #f0f0f0 5%, transparent 5%);"
+        );
     }
 
     public void drawFromGraph() {
@@ -47,8 +63,6 @@ public class GraphPane extends Pane {
 
         // 2. Tạo EdgeView -> Add vào edgeGroup
         for (Edge e : graph.getEdges()) {
-            if (!graph.isDirected() && e.from > e.to) continue;
-
             VertexNode uNode = vertexNodes.get(e.from);
             VertexNode vNode = vertexNodes.get(e.to);
 

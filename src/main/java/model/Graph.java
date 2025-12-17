@@ -83,6 +83,12 @@ public class Graph {
         allEdges.clear();
     }
 
+    public void resetFlow() {
+        for (Edge e : allEdges) {
+            e.currentFlow = 0;
+        }
+    }
+
     public boolean isDirected() {
         return directed;
     }

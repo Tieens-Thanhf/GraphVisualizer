@@ -16,13 +16,21 @@ public enum AlgorithmType {
             g -> g.isWeighted() && !g.isDirected(),
             false, false),
 
+    PRIM("Prim MST",
+            g -> g.isWeighted() && !g.isDirected(),
+            true, false),
+
     TARJAN("Tarjan SCC",
             Graph::isDirected,
-            false, false);
+            false, false),
+
+    MAX_FLOW("Max Flow (Edmonds-Karp)",
+            g -> g.isWeighted() && g.isDirected() && !g.hasNegativeWeights(),
+            true, true);
 
     private final String displayName;
     private final Predicate<Graph> condition;
-    private final boolean requiresStart;  // <--- MỚI
+    private final boolean requiresStart;
     private final boolean requiresTarget;
 
     AlgorithmType(String displayName, Predicate<Graph> condition, boolean requiresStart, boolean requiresTarget) {
@@ -33,7 +41,7 @@ public enum AlgorithmType {
     }
 
     public boolean isCompatible(Graph g) { return condition.test(g); }
-    public boolean isStartRequired() { return requiresStart; } // Getter mới
+    public boolean isStartRequired() { return requiresStart; }
     public boolean isTargetRequired() { return requiresTarget; }
 
     @Override

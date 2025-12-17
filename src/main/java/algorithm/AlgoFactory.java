@@ -18,6 +18,8 @@ public class AlgoFactory {
                 return new Kruskal(graph);
             case TARJAN:
                 return new Tarjan(graph);
+            case MAX_FLOW:
+                return new MaxFlow(graph, start, target);
             default:
                 throw new IllegalArgumentException("Chưa hỗ trợ");
         }
