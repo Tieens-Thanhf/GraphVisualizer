@@ -26,6 +26,14 @@ public enum AlgorithmType {
 
     MAX_FLOW("Max Flow (Edmonds-Karp)",
             g -> g.isWeighted() && g.isDirected() && !g.hasNegativeWeights(),
+            true, true),
+
+    GBFS("Greedy Best-First Search",
+            g -> g.isWeighted(), // Có thể chạy trên không trọng số, nhưng thường dùng có trọng số
+            true, true),
+
+    ASTAR("A* Search",
+            g -> g.isWeighted() && !g.hasNegativeWeights(),
             true, true);
 
     private final String displayName;

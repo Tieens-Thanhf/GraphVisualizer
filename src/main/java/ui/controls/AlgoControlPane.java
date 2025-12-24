@@ -191,20 +191,25 @@ public class AlgoControlPane extends VBox {
             sb.append("----------------\n");
             sb.append("Tổng trọng số: ").append(totalWeight);
 
-        } else if (type == AlgorithmType.DIJKSTRA) {
+        } else if (type == AlgorithmType.DIJKSTRA
+                || type == AlgorithmType.ASTAR
+                || type == AlgorithmType.GBFS) {
+
             List<Integer> path = steps.stream()
                     .filter(s -> s.type == AlgoStep.Type.HIGHLIGHT_NODE)
                     .map(s -> s.u)
                     .toList();
 
             if (!path.isEmpty()) {
-                sb.append("Đường đi ngắn nhất: ");
+                sb.append("Đường đi tìm được: ");
                 String pathStr = path.stream()
                         .map(String::valueOf)
                         .collect(Collectors.joining(" -> "));
                 sb.append(pathStr);
+
                 int totalCost = calculatePathCost(path);
                 sb.append("\nTổng chi phí: ").append(totalCost);
+
             } else {
                 sb.append("Không tìm thấy đường đi.");
             }
