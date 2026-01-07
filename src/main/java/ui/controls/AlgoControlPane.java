@@ -4,31 +4,24 @@ import algorithm.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import model.Edge;
 import model.Graph;
 import ui.GraphPane;
 import ui.animation.AlgoAnimator;
+import ui.formatter.FormatterFactory;
+import ui.formatter.ResultFormatter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+
 
 public class AlgoControlPane extends VBox {
 
     private final Graph graph;
     private final GraphPane graphPane;
-
     private ComboBox<AlgorithmType> algoComboBox;
-
     private VBox startInputContainer;
     private TextField startVertexField;
-
     private VBox targetInputContainer;
     private TextField targetVertexField;
-
-    private Button runBtn; // Chỉ giữ lại nút Run
     private TextArea resultArea;
 
     public AlgoControlPane(Graph graph, GraphPane graphPane) {
@@ -36,20 +29,16 @@ public class AlgoControlPane extends VBox {
         this.graphPane = graphPane;
         setSpacing(10);
         setPadding(new Insets(10));
-
         getStyleClass().add("control-pane");
-
         initUI();
     }
 
     private void initUI() {
-        // 1. Setup Start Node
         startVertexField = new TextField();
         startVertexField.setPromptText("ID Đỉnh bắt đầu");
         startVertexField.getStyleClass().add("text-field");
         startInputContainer = new VBox(5, new Label("Start Node:"), startVertexField);
 
-        // 2. Setup Target Node
         targetVertexField = new TextField();
         targetVertexField.setPromptText("ID Đỉnh đích");
         targetVertexField.getStyleClass().add("text-field");
@@ -57,7 +46,6 @@ public class AlgoControlPane extends VBox {
         targetInputContainer.setVisible(false);
         targetInputContainer.setManaged(false);
 
-        // 3. ComboBox
         algoComboBox = new ComboBox<>();
         algoComboBox.setPrefWidth(Double.MAX_VALUE);
         algoComboBox.getStyleClass().add("combo-box");
@@ -67,13 +55,11 @@ public class AlgoControlPane extends VBox {
 
         refreshAlgoList();
 
-        // 4. Button Run (Đã xóa nút Reset Flow, trả về giao diện gọn gàng)
-        runBtn = new Button("Run Algorithm");
+        Button runBtn = new Button("Run Algorithm");
         runBtn.setPrefWidth(Double.MAX_VALUE);
         runBtn.getStyleClass().add("button");
         runBtn.setOnAction(e -> runAlgorithm());
 
-        // 5. Result Area
         resultArea = new TextArea();
         resultArea.setEditable(false);
         resultArea.setPrefRowCount(6);
@@ -84,7 +70,7 @@ public class AlgoControlPane extends VBox {
                 new Label("Chọn thuật toán:"), algoComboBox,
                 startInputContainer,
                 targetInputContainer,
-                runBtn, // Add trực tiếp runBtn, không qua HBox nữa
+                runBtn,
                 new Label("Kết quả:"), resultArea
         );
     }
@@ -119,14 +105,10 @@ public class AlgoControlPane extends VBox {
             AlgorithmType type = algoComboBox.getValue();
             if (type == null) return;
 
-            // === LOGIC TỰ ĐỘNG RESET LUỒNG ===
-            // Nếu thuật toán KHÔNG phải là MaxFlow, ta phải dọn dẹp hiện trường
-            // để các text dạng "5/10" trở về "10" bình thường.
             if (type != AlgorithmType.MAX_FLOW) {
-                graph.resetFlow();          // Reset dữ liệu model về 0
-                graphPane.drawFromGraph();  // Vẽ lại EdgeView để hiển thị Weight gốc
+                graph.resetFlow();
+                graphPane.drawFromGraph();
             }
-            // Ngược lại (type == MAX_FLOW): Ta KHÔNG reset, để giữ tính năng cộng dồn luồng.
 
             int start = -1;
             int target = -1;
@@ -148,7 +130,6 @@ public class AlgoControlPane extends VBox {
             GraphAlgorithm algo = AlgoFactory.createAlgorithm(type, graph, start, target);
             var steps = algo.run();
 
-            // Reset Visual (chỉ xóa màu đỏ/xanh, không xóa text trên cạnh)
             graphPane.resetVisual();
 
             AlgoAnimator animator = new AlgoAnimator(steps, graphPane);
@@ -167,7 +148,6 @@ public class AlgoControlPane extends VBox {
     private void printResult(AlgorithmType type, List<AlgoStep> steps) {
         StringBuilder sb = new StringBuilder();
 
-        // Check MaxFlow Result
         var resultStep = steps.stream()
                 .filter(s -> s.type == AlgoStep.Type.SHOW_RESULT)
                 .findFirst();
@@ -177,88 +157,11 @@ public class AlgoControlPane extends VBox {
             sb.append(resultStep.get().extraData).append("\n\n");
         }
 
-        if (type == AlgorithmType.KRUSKAL) {
-            sb.append("Minimum Spanning Tree (Kruskal):\n");
-            int totalWeight = 0;
-            var mstSteps = steps.stream()
-                    .filter(s -> s.type == AlgoStep.Type.HIGHLIGHT_PATH)
-                    .toList();
-            for (AlgoStep s : mstSteps) {
-                int w = getEdgeWeight(s.u, s.v);
-                totalWeight += w;
-                sb.append(String.format("Cạnh (%d - %d) : %d\n", s.u, s.v, w));
-            }
-            sb.append("----------------\n");
-            sb.append("Tổng trọng số: ").append(totalWeight);
+        ResultFormatter formatter = FormatterFactory.getFormatter(type);
 
-        } else if (type == AlgorithmType.DIJKSTRA
-                || type == AlgorithmType.ASTAR
-                || type == AlgorithmType.GBFS) {
-
-            List<Integer> path = steps.stream()
-                    .filter(s -> s.type == AlgoStep.Type.HIGHLIGHT_NODE)
-                    .map(s -> s.u)
-                    .toList();
-
-            if (!path.isEmpty()) {
-                sb.append("Đường đi tìm được: ");
-                String pathStr = path.stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(" -> "));
-                sb.append(pathStr);
-
-                int totalCost = calculatePathCost(path);
-                sb.append("\nTổng chi phí: ").append(totalCost);
-
-            } else {
-                sb.append("Không tìm thấy đường đi.");
-            }
-
-        } else if (type == AlgorithmType.TARJAN) {
-            sb.append("Strongly Connected Components (Tarjan):\n");
-            Map<Integer, List<Integer>> sccMap = new TreeMap<>();
-            for (AlgoStep s : steps) {
-                if (s.type == AlgoStep.Type.FOUND_SCC) {
-                    sccMap.computeIfAbsent(s.v, k -> new ArrayList<>()).add(s.u);
-                }
-            }
-            sb.append("Tổng số vùng liên thông: ").append(sccMap.size()).append("\n");
-            sccMap.forEach((id, nodes) -> {
-                sb.append("Vùng ").append(id + 1).append(": { ")
-                        .append(nodes.stream().map(String::valueOf).collect(Collectors.joining(", ")))
-                        .append(" }\n");
-            });
-
-        } else if (type == AlgorithmType.MAX_FLOW) {
-            sb.append("Chi tiết đường tăng luồng:\n");
-            sb.append("Màu đỏ thể hiện đường đi của luồng nước.");
-
-        } else {
-            sb.append("Thứ tự duyệt:\n");
-            String path = steps.stream()
-                    .filter(s -> s.type == AlgoStep.Type.VISIT_VERTEX)
-                    .map(s -> String.valueOf(s.u))
-                    .distinct()
-                    .collect(Collectors.joining(" -> "));
-            sb.append(path);
-        }
+        sb.append(formatter.format(graph, steps));
 
         resultArea.setText(sb.toString());
-    }
-
-    private int calculatePathCost(List<Integer> pathNodes) {
-        int cost = 0;
-        for (int i = 0; i < pathNodes.size() - 1; i++) {
-            cost += getEdgeWeight(pathNodes.get(i), pathNodes.get(i + 1));
-        }
-        return cost;
-    }
-
-    private int getEdgeWeight(int u, int v) {
-        for (Edge e : graph.getAdj(u)) {
-            if (e.to == v) return e.weight;
-        }
-        return 0;
     }
 
     private void showAlert(String msg) {

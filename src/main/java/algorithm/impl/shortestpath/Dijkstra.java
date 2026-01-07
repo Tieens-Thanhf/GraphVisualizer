@@ -10,10 +10,9 @@ public class Dijkstra implements GraphAlgorithm {
 
     private final Graph graph;
     private final int startNode;
-    private final int targetNode; // <--- MỚI
+    private final int targetNode;
     private final List<AlgoStep> steps;
 
-    // Constructor nhận thêm targetNode (-1 nếu không muốn tìm đích cụ thể)
     public Dijkstra(Graph graph, int startNode, int targetNode) {
         this.graph = graph;
         this.startNode = startNode;
@@ -30,14 +29,14 @@ public class Dijkstra implements GraphAlgorithm {
         Arrays.fill(dist, Integer.MAX_VALUE);
         dist[startNode] = 0;
 
-        int[] parent = new int[n + 1]; // Mảng truy vết
+        int[] parent = new int[n + 1];
         Arrays.fill(parent, -1);
 
         PriorityQueue<NodeDist> pq = new PriorityQueue<>(Comparator.comparingInt(nd -> nd.dist));
         pq.add(new NodeDist(startNode, 0));
 
         boolean[] finalized = new boolean[n + 1];
-        boolean targetFound = false; // Cờ đánh dấu
+        boolean targetFound = false;
 
         steps.add(new AlgoStep(AlgoStep.Type.VISIT_VERTEX, startNode, -1));
 
@@ -52,13 +51,11 @@ public class Dijkstra implements GraphAlgorithm {
                 steps.add(new AlgoStep(AlgoStep.Type.VISIT_VERTEX, u, parent[u]));
             }
 
-            // Hiệu ứng thăm đỉnh
             steps.add(new AlgoStep(AlgoStep.Type.VISIT_VERTEX, u, parent[u]));
 
-            // === 1. KIỂM TRA ĐÍCH (EARLY EXIT) ===
             if (u == targetNode) {
                 targetFound = true;
-                break; // Dừng ngay vòng lặp, không cần duyệt tiếp các đỉnh thừa
+                break;
             }
 
             for (Edge e : graph.getAdj(u)) {
@@ -76,7 +73,6 @@ public class Dijkstra implements GraphAlgorithm {
             steps.add(new AlgoStep(AlgoStep.Type.FINISH_VERTEX, u, -1));
         }
 
-        // === 2. TRUY VẾT ĐƯỜNG ĐI (BACKTRACKING) ===
         if (targetFound) {
             reconstructPath(parent, targetNode);
         }
@@ -84,7 +80,6 @@ public class Dijkstra implements GraphAlgorithm {
         return steps;
     }
 
-    // Hàm lần ngược từ Đích -> Nguồn để tạo hiệu ứng tô màu đường đi
     private void reconstructPath(int[] parent, int target) {
         List<Integer> path = new ArrayList<>();
         int curr = target;
@@ -94,7 +89,6 @@ public class Dijkstra implements GraphAlgorithm {
         }
         Collections.reverse(path);
 
-        // Tô màu Đỉnh bắt đầu
         if (!path.isEmpty()) {
             steps.add(new AlgoStep(AlgoStep.Type.HIGHLIGHT_NODE, path.get(0), -1));
         }
@@ -103,10 +97,7 @@ public class Dijkstra implements GraphAlgorithm {
             int u = path.get(i);
             int v = path.get(i + 1);
 
-            // 1. Tô màu cạnh nối u -> v
             steps.add(new AlgoStep(AlgoStep.Type.HIGHLIGHT_PATH, u, v));
-
-            // 2. Tô màu đỉnh đích v (để nó chuyển từ Xanh -> Đỏ)
             steps.add(new AlgoStep(AlgoStep.Type.HIGHLIGHT_NODE, v, -1));
         }
     }

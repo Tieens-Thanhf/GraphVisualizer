@@ -27,15 +27,12 @@ public class AStar implements GraphAlgorithm {
         steps.clear();
         int n = graph.vertexCount();
 
-        // gScore: Chi phí thực tế từ Start -> u
         Map<Integer, Double> gScore = new HashMap<>();
 
-        // PQ sắp xếp theo f(n) = g(n) + h(n)
         PriorityQueue<NodeCost> pq = new PriorityQueue<>(Comparator.comparingDouble(node -> node.fCost));
 
         Map<Integer, Integer> parent = new HashMap<>();
 
-        // Init
         gScore.put(start, 0.0);
         Vertex targetV = graph.getVertex(target);
         pq.add(new NodeCost(start, heuristic(start, targetV)));
@@ -45,45 +42,27 @@ public class AStar implements GraphAlgorithm {
         while (!pq.isEmpty()) {
             NodeCost current = pq.poll();
             int u = current.id;
-
-            // Nếu lấy ra đỉnh mà đã có đường ngắn hơn trong gScore rồi thì bỏ qua (Lazy deletion)
-            // (Lưu ý: Logic A* chuẩn cần update priority, nhưng trong Java PQ ko hỗ trợ update
-            // nên ta cứ add thêm vào, và check ở đây)
-            if (current.fCost > gScore.getOrDefault(u, Double.MAX_VALUE) + heuristic(u, targetV)) {
-                // Check hơi phức tạp tí vì fCost bao gồm cả h(n), nhưng đơn giản là:
-                // Nếu gScore thực tế hiện tại còn tốt hơn cái node trong PQ thì node này là rác cũ.
-                // Tuy nhiên để đơn giản, cứ process, A* vẫn đúng.
-            }
-
             steps.add(new AlgoStep(AlgoStep.Type.VISIT_VERTEX, u, -1));
-
             if (u == target) {
                 found = true;
                 break;
             }
-
             for (Edge e : graph.getAdj(u)) {
                 int v = e.to;
                 double newG = gScore.get(u) + e.weight;
-
                 if (newG < gScore.getOrDefault(v, Double.MAX_VALUE)) {
                     gScore.put(v, newG);
                     parent.put(v, u);
-
                     double h = heuristic(v, targetV);
                     double f = newG + h;
-
                     pq.add(new NodeCost(v, f));
-
                     steps.add(new AlgoStep(AlgoStep.Type.EXPLORE_EDGE, u, v));
                 }
             }
         }
-
         if (found) {
             reconstructPath(parent);
         }
-
         return steps;
     }
 

@@ -22,13 +22,9 @@ public class GraphPane extends Pane {
     private final Map<Integer, VertexNode> vertexNodes = new HashMap<>();
     private final Map<String, EdgeView> edgeViews = new HashMap<>();
 
-    // Group chứa nội dung (Cạnh + Đỉnh) để Zoom/Pan
-    private final Group contentGroup = new Group();
-
     private final Group edgeGroup = new Group();
     private final Group nodeGroup = new Group();
 
-    // Các biến dùng cho Zoom/Pan
     private final Scale scaleTransform = new Scale(1, 1);
     private final Translate translateTransform = new Translate(0, 0);
     private double lastMouseX, lastMouseY;
@@ -36,50 +32,38 @@ public class GraphPane extends Pane {
     public GraphPane(Graph graph) {
         this.graph = graph;
 
-        // CSS Background Grid (Lưới)
         setStyle("-fx-background-color: white; -fx-border-color: #cfd8dc; -fx-border-width: 1px;");
         drawGrid();
 
-        // Cấu trúc: GraphPane -> contentGroup -> [edgeGroup, nodeGroup]
+        Group contentGroup = new Group();
         contentGroup.getChildren().addAll(edgeGroup, nodeGroup);
-
-        // Áp dụng Transform vào contentGroup
         contentGroup.getTransforms().addAll(translateTransform, scaleTransform);
-
         getChildren().add(contentGroup);
-
-        // Đăng ký sự kiện Zoom và Pan
         setupZoomAndPan();
     }
 
     private void setupZoomAndPan() {
-        // 1. ZOOM (Lăn chuột)
         setOnScroll((ScrollEvent event) -> {
-            if (event.isControlDown()) return; // Đề phòng xung đột phím tắt
+            if (event.isControlDown()) return;
 
             double zoomFactor = 1.05;
             double deltaY = event.getDeltaY();
 
             if (deltaY < 0) {
-                zoomFactor = 1 / zoomFactor; // Zoom out
+                zoomFactor = 1 / zoomFactor;
             }
 
-            // Giới hạn Zoom (từ 0.2x đến 5.0x)
             double currentScale = scaleTransform.getX();
             if (currentScale * zoomFactor < 0.2 || currentScale * zoomFactor > 5.0) {
                 return;
             }
 
-            // Tính toán vị trí chuột tương đối trong contentGroup
-            // Công thức này giúp Zoom ngay tại đầu con trỏ chuột (Google Maps style)
             double mouseX = (event.getX() - translateTransform.getX()) / currentScale;
             double mouseY = (event.getY() - translateTransform.getY()) / currentScale;
 
-            // Thực hiện Scale
             scaleTransform.setX(scaleTransform.getX() * zoomFactor);
             scaleTransform.setY(scaleTransform.getY() * zoomFactor);
 
-            // Điều chỉnh Translate để giữ vị trí chuột cố định sau khi zoom
             double newScale = scaleTransform.getX();
             translateTransform.setX(translateTransform.getX() - (mouseX * newScale - mouseX * currentScale));
             translateTransform.setY(translateTransform.getY() - (mouseY * newScale - mouseY * currentScale));
@@ -87,13 +71,11 @@ public class GraphPane extends Pane {
             event.consume();
         });
 
-        // 2. PAN (Giữ chuột phải để kéo)
         setOnMousePressed(event -> {
-            // Chỉ bắt sự kiện chuột phải (Chuột trái để kéo Node rồi)
             if (event.getButton() == MouseButton.SECONDARY) {
                 lastMouseX = event.getSceneX();
                 lastMouseY = event.getSceneY();
-                setCursor(javafx.scene.Cursor.MOVE); // Đổi con trỏ thành mũi tên 4 chiều
+                setCursor(javafx.scene.Cursor.MOVE);
             }
         });
 
@@ -117,7 +99,6 @@ public class GraphPane extends Pane {
         });
     }
 
-    // Hàm vẽ lưới nền (Grid) - Dùng CSS để khi Pan lưới không bị trôi đi (Tạo cảm giác vô tận)
     private void drawGrid() {
         this.setStyle(
                 "-fx-background-color: white, " +
@@ -126,7 +107,6 @@ public class GraphPane extends Pane {
         );
     }
 
-    // === Reset góc nhìn về mặc định ===
     public void resetView() {
         scaleTransform.setX(1);
         scaleTransform.setY(1);
@@ -134,7 +114,6 @@ public class GraphPane extends Pane {
         translateTransform.setY(0);
     }
 
-    // ... (Giữ nguyên phần drawFromGraph, getEdge, getNodes, resetVisual bên dưới) ...
     public void drawFromGraph() {
         edgeGroup.getChildren().clear();
         nodeGroup.getChildren().clear();
@@ -163,7 +142,7 @@ public class GraphPane extends Pane {
     }
 
     public Map<Integer, VertexNode> getNodes() { return vertexNodes; }
-    public Map<String, EdgeView> getEdgeViews() { return edgeViews; } // Helper nếu cần
+    public Map<String, EdgeView> getEdgeViews() { return edgeViews; }
 
     public void resetVisual() {
         vertexNodes.values().forEach(VertexNode::resetColor);

@@ -9,7 +9,7 @@ public enum AlgorithmType {
     DFS("Depth-First Search", g -> true, true, false),
 
     DIJKSTRA("Dijkstra Shortest Path",
-            g -> g.isWeighted() && !g.hasNegativeWeights(),
+            g -> g.isWeighted() && g.hasNegativeWeights(),
             true, true),
 
     KRUSKAL("Kruskal MST",
@@ -25,15 +25,15 @@ public enum AlgorithmType {
             false, false),
 
     MAX_FLOW("Max Flow (Edmonds-Karp)",
-            g -> g.isWeighted() && g.isDirected() && !g.hasNegativeWeights(),
+            g -> g.isWeighted() && g.isDirected() && g.hasNegativeWeights(),
             true, true),
 
     GBFS("Greedy Best-First Search",
-            g -> g.isWeighted(), // Có thể chạy trên không trọng số, nhưng thường dùng có trọng số
+            Graph::isWeighted,
             true, true),
 
     ASTAR("A* Search",
-            g -> g.isWeighted() && !g.hasNegativeWeights(),
+            g -> g.isWeighted() && g.hasNegativeWeights(),
             true, true);
 
     private final String displayName;

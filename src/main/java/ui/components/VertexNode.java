@@ -16,7 +16,6 @@ public class VertexNode extends StackPane {
 
     private final Vertex vertex;
     private final Circle circle;
-    private final Label label;
 
     public VertexNode(Vertex v) {
         this.vertex = v;
@@ -25,7 +24,7 @@ public class VertexNode extends StackPane {
         circle.setFill(Color.LIGHTGRAY);
         circle.setStroke(Color.BLACK);
 
-        label = new Label(String.valueOf(v.id));
+        Label label = new Label(String.valueOf(v.id));
         label.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         label.setMouseTransparent(true);
 
@@ -52,9 +51,7 @@ public class VertexNode extends StackPane {
     }
 
     public void highlightResult() {
-        // Màu đỏ rực rỡ để phân biệt với màu xanh lá (visited)
         circle.setFill(Color.RED);
-        // Có thể thêm viền vàng cho nổi
         circle.setStroke(Color.GOLD);
         circle.setStrokeWidth(2);
     }
@@ -86,7 +83,7 @@ public class VertexNode extends StackPane {
 
     public void setCustomColor(Color color) {
         circle.setFill(color);
-        circle.setStroke(Color.WHITE); // Viền trắng cho nổi trên nền màu đậm
+        circle.setStroke(Color.WHITE);
         circle.setStrokeWidth(2.0);
     }
 

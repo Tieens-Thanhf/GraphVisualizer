@@ -27,15 +27,11 @@ public class GBFS implements GraphAlgorithm {
         steps.clear();
         int n = graph.vertexCount();
 
-        // PriorityQueue sắp xếp theo h(n) tăng dần
         PriorityQueue<NodeCost> pq = new PriorityQueue<>(Comparator.comparingDouble(node -> node.cost));
-
         Map<Integer, Integer> parent = new HashMap<>();
         Set<Integer> visited = new HashSet<>();
-
         Vertex targetVertex = graph.getVertex(target);
 
-        // Đưa start vào
         pq.add(new NodeCost(start, heuristic(start, targetVertex)));
         visited.add(start);
 
@@ -44,9 +40,7 @@ public class GBFS implements GraphAlgorithm {
         while (!pq.isEmpty()) {
             NodeCost current = pq.poll();
             int u = current.id;
-
             steps.add(new AlgoStep(AlgoStep.Type.VISIT_VERTEX, u, -1));
-
             if (u == target) {
                 found = true;
                 break;
@@ -70,11 +64,9 @@ public class GBFS implements GraphAlgorithm {
         if (found) {
             reconstructPath(parent);
         }
-
         return steps;
     }
 
-    // Hàm Heuristic: Khoảng cách Euclid
     private double heuristic(int uId, Vertex targetV) {
         Vertex u = graph.getVertex(uId);
         double dx = u.x - targetV.x;
@@ -101,10 +93,9 @@ public class GBFS implements GraphAlgorithm {
         }
     }
 
-    // Helper class để lưu trong PriorityQueue
     private static class NodeCost {
         int id;
-        double cost; // Với GBFS, cost này chính là h(n)
+        double cost;
 
         public NodeCost(int id, double cost) {
             this.id = id;

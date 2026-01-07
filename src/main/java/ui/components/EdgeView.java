@@ -12,12 +12,10 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import model.Edge;
 
-import java.util.Optional;
-
 public class EdgeView {
     private static final double ARROW_SIZE = 10;
     private static final double ARROW_DISTANCE = VertexNode.RADIUS + 3;
-    private static final double LABEL_OFFSET_DISTANCE = 15.0; // Khoảng cách chữ bay lên so với dây
+    private static final double LABEL_OFFSET_DISTANCE = 15.0;
 
     private final Edge edge;
     private final Line line;
@@ -35,7 +33,6 @@ public class EdgeView {
         line.setStroke(Color.BLACK);
         line.setStrokeWidth(1.0);
 
-        // Binding to centers
         double r = VertexNode.RADIUS;
         line.startXProperty().bind(from.layoutXProperty().add(from.translateXProperty()).add(r));
         line.startYProperty().bind(from.layoutYProperty().add(from.translateYProperty()).add(r));
@@ -45,7 +42,6 @@ public class EdgeView {
         if (showWeight) {
             label = new Text(String.valueOf(edge.weight));
             label.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-            // Mẹo: Thêm viền trắng mỏng quanh chữ để chữ nổi bật trên nền các đường dây khác
             label.setStyle("-fx-stroke: white; -fx-stroke-width: 0.5px; -fx-fill: black;");
 
             label.setCursor(Cursor.HAND);
@@ -58,10 +54,8 @@ public class EdgeView {
         arrow = new Polygon();
         arrow.setVisible(directed);
 
-        // Update vị trí ban đầu
         update();
 
-        // Listeners để cập nhật vị trí khi node di chuyển
         from.layoutXProperty().addListener(o -> update());
         from.layoutYProperty().addListener(o -> update());
         from.translateXProperty().addListener(o -> update());
@@ -72,7 +66,6 @@ public class EdgeView {
         to.translateXProperty().addListener(o -> update());
         to.translateYProperty().addListener(o -> update());
 
-        // Tương tác chuột trên dây
         if (showWeight) {
             line.setCursor(Cursor.HAND);
             line.setOnMouseClicked(this::handleMouseClick);
@@ -91,26 +84,20 @@ public class EdgeView {
 
         if (len == 0) return;
 
-        // 1. Cập nhật vị trí Label (Dùng vector pháp tuyến để đẩy chữ lên trên)
         if (label != null) {
-            double mx = (x1 + x2) / 2; // Trung điểm
+            double mx = (x1 + x2) / 2;
             double my = (y1 + y2) / 2;
 
-            // Vector đơn vị của dây: (ux, uy)
             double ux = dx / len;
             double uy = dy / len;
 
-            // Vector pháp tuyến (vuông góc): (-uy, ux)
-            // Ta nhân với khoảng cách muốn đẩy ra (LABEL_OFFSET_DISTANCE)
             double nx = -uy * LABEL_OFFSET_DISTANCE;
             double ny = ux * LABEL_OFFSET_DISTANCE;
 
-            // Đặt vị trí mới
             label.setX(mx + nx - label.getLayoutBounds().getWidth() / 2);
             label.setY(my + ny);
         }
 
-        // 2. Cập nhật mũi tên (Giữ nguyên logic cũ của bạn)
         if (directed) {
             double ux = dx / len;
             double uy = dy / len;
@@ -128,11 +115,6 @@ public class EdgeView {
         }
     }
 
-    // ... (Các hàm handleMouseClick, highlight, getter giữ nguyên như file trước) ...
-    // Bạn copy lại các hàm handleMouseClick, showEditWeightDialog, setHighlight... vào đây nhé
-    // Để tiết kiệm không gian mình không paste lại phần không thay đổi.
-
-    // Copy lại phần MouseClick từ câu trả lời trước:
     private void handleMouseClick(MouseEvent e) {
         if (e.getClickCount() == 2 && showWeight) showEditWeightDialog();
     }
@@ -158,7 +140,7 @@ public class EdgeView {
         line.toFront();
         arrow.toFront();
         if (label != null) {
-            label.setFill(color); // Khi highlight thì chữ cũng đổi màu theo
+            label.setFill(color);
             label.toFront();
         }
     }
