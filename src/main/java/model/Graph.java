@@ -98,12 +98,12 @@ public class Graph {
     }
 
     public boolean hasNegativeWeights() {
-        if (!weighted) return false;
+        if (!weighted) return true;
 
         for (Edge e : allEdges) {
-            if (e.weight < 0) return true;
+            if (e.weight < 0) return false;
         }
-        return false;
+        return true;
     }
 
     public List<Edge> getAdj(int u) {

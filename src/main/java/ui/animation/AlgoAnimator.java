@@ -19,7 +19,7 @@ public class AlgoAnimator {
 
         timeline = new Timeline();
         Duration time = Duration.ZERO;
-        Duration stepTime = Duration.seconds(0.8); // Chậm lại chút để kịp nhìn text nhảy
+        Duration stepTime = Duration.seconds(0.8);
 
         for (AlgoStep s : steps) {
             time = time.add(stepTime);
@@ -31,7 +31,6 @@ public class AlgoAnimator {
 
     private void applyStep(AlgoStep s) {
         VertexNode uNode = graphPane.getNodes().get(s.u);
-        // Với UPDATE_FLOW_TEXT, s.v là đích của cạnh
         EdgeView edge = (s.v != -1) ? graphPane.getEdge(s.u, s.v) : null;
 
         switch (s.type) {
@@ -50,13 +49,12 @@ public class AlgoAnimator {
                 }
             }
 
-            // --- MỚI: CẬP NHẬT LABEL TRÊN CẠNH ---
             case UPDATE_FLOW_TEXT -> {
                 if (edge != null && s.extraData != null) {
                     // Update text của Label
                     if (edge.getLabel() != null) {
                         edge.getLabel().setText(s.extraData);
-                        edge.getLabel().setFill(Color.BLUE); // Đổi màu chữ để gây chú ý
+                        edge.getLabel().setFill(Color.BLUE);
                     }
                 }
             }

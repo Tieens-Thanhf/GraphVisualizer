@@ -1,5 +1,7 @@
-package algorithm;
+package algorithm.impl.traversal;
 
+import algorithm.AlgoStep;
+import algorithm.GraphAlgorithm;
 import model.Edge;
 import model.Graph;
 import java.util.*;

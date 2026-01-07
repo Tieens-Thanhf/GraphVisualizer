@@ -2,61 +2,50 @@ package ui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Graph;
 import model.GraphConfig;
-import java.net.URL;
 
 public class MainApp extends Application {
 
-    private Stage stage;
+    private Stage primaryStage;
+    private Scene scene;
 
     @Override
-    public void start(Stage stage) {
-        this.stage = stage;
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        primaryStage.setTitle("Graph Algorithms Visualizer");
+
         showSetup();
-        stage.show();
+
+        primaryStage.show();
     }
 
     public void showSetup() {
-        Scene scene = new Scene(new GraphSetupPane(this), 600, 320);
+        GraphSetupPane setupPane = new GraphSetupPane(this::startGraphEditor);
 
-        loadCSS(scene);
+        if (scene == null) {
+            scene = new Scene(setupPane, 600, 400);
+            primaryStage.setScene(scene);
+        } else {
+            scene.setRoot(setupPane);
 
-        stage.setScene(scene);
-        stage.setTitle("Graph Visualizer - Setup");
+            primaryStage.setWidth(600);
+            primaryStage.setHeight(400);
+            primaryStage.centerOnScreen();
+        }
     }
 
     public void startGraphEditor(GraphConfig config) {
         Graph graph = new Graph(config);
-        GraphPane graphPane = new GraphPane(graph);
-        ControlPane controlPane = new ControlPane(this, graph, graphPane);
 
-        BorderPane root = new BorderPane();
-        root.setLeft(controlPane);
-        root.setCenter(graphPane);
+        MainLayout mainLayout = new MainLayout(this, graph);
 
-        Scene scene = new Scene(root, 1100, 700); // Tăng kích thước chút cho đẹp
+        scene.setRoot(mainLayout);
 
-        loadCSS(scene);
-
-        stage.setScene(scene);
-        stage.setTitle("Graph Visualizer - Editor");
-        stage.centerOnScreen();
-    }
-
-    private void loadCSS(Scene scene) {
-        try {
-            URL cssUrl = getClass().getResource("/style.css");
-            if (cssUrl != null) {
-                scene.getStylesheets().add(cssUrl.toExternalForm());
-            } else {
-                System.err.println("Cảnh báo: Không tìm thấy file style.css!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        primaryStage.setWidth(1100);
+        primaryStage.setHeight(750);
+        primaryStage.centerOnScreen();
     }
 
     public static void main(String[] args) {
