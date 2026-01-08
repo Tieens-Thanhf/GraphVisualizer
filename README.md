@@ -1,6 +1,6 @@
 🕸️ Graph Algorithms Visualizer
 **(Ứng dụng Mô phỏng Thuật toán Đồ thị)**
-=> Một công cụ trực quan hóa mạnh mẽ giúp sinh viên và giảng viên hiểu rõ cơ chế hoạt động của các thuật toán đồ thị phổ biến thông qua các hiệu ứng hình ảnh động (Animation) và tương tác.
+
 ---
 ## 🚀 Giới thiệu
 Dự án này được phát triển bằng ngôn ngữ Java và thư viện JavaFX, áp dụng mô hình kiến trúc MVC và các mẫu thiết kế hiện đại. Ứng dụng cho phép người dùng vẽ đồ thị, nhập dữ liệu từ file, và chạy mô phỏng các thuật toán từ cơ bản đến nâng cao.
